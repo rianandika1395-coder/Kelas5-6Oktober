@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif: Yesus Lahir Bagiku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+        
+        .print-only {
+            display: none;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background-color: white;
+            }
+            .shadow-lg {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col" x-data="quizApp()">
+
+    <header class="bg-blue-600 text-white shadow-md p-4 sticky top-0 z-10 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">Pelajaran 4: Yesus Lahir Bagiku</h1>
+            <div class="text-sm bg-blue-700 px-3 py-1 rounded-full">
+                Langkah <span x-text="currentStep + 1"></span> dari <span x-text="totalSteps"></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 md:p-8 flex items-center justify-center">
+        <div class="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300">
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 h-2 no-print">
+                <div class="bg-blue-500 h-2 transition-all duration-500 ease-in-out" :style="`width: ${((currentStep + 1) / totalSteps) * 100}%`"></div>
+            </div>
+
+            <div class="p-6 md:p-10">
+                
+                <div x-show="currentStep === 0" x-transition.opacity.duration.300ms>
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 mb-10 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-32 w-32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <div class="flex items-center mb-5 relative z-10">
+                            <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-3 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+                                </svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-800 border-b-2 border-blue-400 pb-1">Identitas Siswa</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap: <span class="text-red-500">*</span></label>
+                                <input type="text" x-model="studentName" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white shadow-sm" placeholder="Ketik namamu di sini...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas / No. Absen: <span class="text-red-500">*</span></label>
+                                <input type="text" x-model="studentClass" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white shadow-sm" placeholder="Cth: 5A / 12">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center mb-6">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">1</div>
+                        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 inline-block">Pertanyaan Refleksi</h2>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-yellow-50 p-5 rounded-lg border border-yellow-200">
+                            <label class="block font-medium text-gray-700 mb-2">1. Tulislah tujuan Yesus Kristus lahir ke dunia!</label>
+                            <textarea x-model="answers.tujuan_lahir" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" placeholder="Ketik jawabanmu di sini..."></textarea>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-5 rounded-lg border border-yellow-200">
+                            <label class="block font-medium text-gray-700 mb-2">2. Bagaimana tanggapan kalian atas kasih Allah dalam hidup kalian?</label>
+                            <textarea x-model="answers.tanggapan_kasih" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" placeholder="Ketik jawabanmu di sini..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="currentStep === 1" x-transition.opacity.duration.300ms style="display: none;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mr-3 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold bg-blue-100 text-blue-800 px-4 py-2 rounded-full inline-block">Kegiatan 6: Mari Berkarya</h2>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-6 italic">Allah mengasihi hidup kalian karena itu Allah memberikan Anak-Nya yang tunggal yaitu Yesus Kristus menjadi Juruselamatmu. Buatlah sebuah puisi yang menyatakan rasa syukur dan terima kasih kalian kepada Allah yang telah mengutus Yesus Kristus sebagai Juruselamat bagi kalian!</p>
+                    
+                    <div class="bg-green-100 p-6 rounded-xl border border-green-300 relative shadow-inner">
+                        <h3 class="text-center font-bold text-blue-700 mb-4 text-lg">Yesus Kristus Juruselamatku</h3>
+                        <textarea x-model="answers.puisi" rows="8" class="w-full p-4 border border-green-400 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/80 transition-shadow text-center leading-relaxed" placeholder="Tulis puisimu di sini..."></textarea>
+                    </div>
+                </div>
+
+                <div x-show="currentStep === 2" x-transition.opacity.duration.300ms style="display: none;">
+                    <div class="flex items-center mb-6">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">E</div>
+                        <h2 class="text-2xl font-bold text-gray-800 bg-blue-200 px-4 py-1 rounded-full inline-block">Penilaian Pilihan Ganda</h2>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">Pilih satu jawaban yang paling tepat.</p>
+                    
+                    <div class="space-y-6">
+                        <!-- Soal 1 -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-medium text-gray-800 mb-3">1. Injil Matius 2: 11a menceritakan bahwa Orang-orang Majus datang menyembah Yesus di ....</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg1" value="A" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">A. Gua</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg1" value="B" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">B. Kandang</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg1" value="C" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">C. Rumah</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg1" value="D" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">D. Istana</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Soal 2 -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-medium text-gray-800 mb-3">2. Dalam Injil Matius 2: 1—12 dikisahkan bahwa para majus dari Timur datang menjumpai Yesus di Yerusalem dan mempersembahkan mas, kemenyan dan mur. Berdasarkan Injil Matius 2: 1—11 tersebut, jumlah orang majus yang datang melihat dan menyembah bayi Yesus adalah ....</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg2" value="A" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">A. Tiga orang.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg2" value="B" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">B. Empat orang.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg2" value="C" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">C. Lima orang.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg2" value="D" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">D. Tidak dicatat berapa banyak jumlah orang majus yang datang menyembah Yesus.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="currentStep === 3" x-transition.opacity.duration.300ms style="display: none;">
+                    <div class="flex items-center mb-6">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">E</div>
+                        <h2 class="text-2xl font-bold text-gray-800 bg-blue-200 px-4 py-1 rounded-full inline-block">Penilaian Pilihan Ganda (Lanjutan)</h2>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Soal 3 -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-medium text-gray-800 mb-3">3. Yang melatarbelakangi sehingga Allah mengutus Anak-Nya yang tunggal yaitu Yesus Kristus untuk datang ke dalam dunia adalah ....</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg3" value="A" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">A. Kasih Allah yang begitu besar kepada manusia agar manusia tidak binasa.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg3" value="B" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">B. Manusia pertama telah berbuat dosa.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg3" value="C" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">C. Kasih Allah kepada Adam dan Hawa.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg3" value="D" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">D. Adam dan Hawa melanggar kehendak Allah.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Soal 4 -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-medium text-gray-800 mb-3">4. Rencana Allah menghadirkan Yesus Kristus ke dunia diwujudkan melalui seorang perempuan yang bernama Maria. Maria menanggapi rencana Allah yang disampaikan lewat malaikat Gabriel kepadanya dengan cara ....</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg4" value="A" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">A. Takut dan terkejut, lalu percaya akan perkataan malaikat Gabriel.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg4" value="B" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">B. Ragu dan khawatir, lalu berubah percaya akan perkataan malaikat Gabriel.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg4" value="C" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">C. Taat akan rencana Allah, ia menerima serta percaya akan perkataan malaikat Gabriel.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg4" value="D" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">D. Menolak, kemudian sadar dan percaya dengan perkataan malaikat Gabriel.</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Soal 5 -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-medium text-gray-800 mb-3">5. Yesus Kristus telah lahir untuk menyelamatkan kalian dari dosa-dosa. Sikap yang paling tepat dilakukan agar kalian tidak jatuh dalam dosa adalah ....</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg5" value="A" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">A. Menjauhi teman yang tidak jujur.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg5" value="B" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">B. Bergaul dengan teman yang baik.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg5" value="C" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">C. Waspada agar tidak tergoda ajakan teman melanggar peraturan sekolah.</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 rounded hover:bg-gray-100 transition-colors">
+                                    <input type="radio" x-model="answers.pg5" value="D" class="form-radio h-5 w-5 text-blue-600">
+                                    <span class="ml-3 text-gray-700">D. Taat melakukan perintah Tuhan setiap saat.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="currentStep === 4" x-transition.opacity.duration.300ms style="display: none;">
+                    <div class="flex items-center mb-6">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">E</div>
+                        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 inline-block">Jawablah pertanyaan berikut!</h2>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="p-4 border-l-4 border-blue-500 bg-white shadow-sm">
+                            <label class="block font-medium text-gray-800 mb-2">1. Bagaimana cara memantapkan keyakinan iman bahwa kalian sungguh-sungguh percaya bahwa Yesus Kristus adalah Juruselamat kalian?</label>
+                            <textarea x-model="answers.uraian1" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-blue-50/30" placeholder="Ketik jawabanmu di sini..."></textarea>
+                        </div>
+                        
+                        <div class="p-4 border-l-4 border-blue-500 bg-white shadow-sm">
+                            <label class="block font-medium text-gray-800 mb-2">2. Bagaimana kalian mengembangkan hidup yang memelihara keselamatan di dalam Yesus Kristus?</label>
+                            <textarea x-model="answers.uraian2" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-blue-50/30" placeholder="Ketik jawabanmu di sini..."></textarea>
+                        </div>
+
+                        <div class="p-4 border-l-4 border-blue-500 bg-white shadow-sm">
+                            <label class="block font-medium text-gray-800 mb-2">3. Kalian sudah menerima keselamatan dari Allah melalui kehadiran Yesus yang mengampuni dosa-dosa kalian. Tindakan apa yang dapat kalian lakukan agar tidak jatuh dalam dosa?</label>
+                            <textarea x-model="answers.uraian3" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-blue-50/30" placeholder="Ketik jawabanmu di sini..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hasil-akhir" x-show="currentStep === 5" x-transition.opacity.duration.500ms style="display: none;" class="print-container">
+                    
+                    <div class="text-center mb-8 no-print">
+                        <h2 class="text-3xl font-bold text-green-600 mb-2">Kerja Bagus, <span x-text="studentName"></span>! 🎉</h2>
+                        <p class="text-gray-600">Silakan ambil <i>screenshot</i> halaman ini untuk dikumpulkan ke Google Classroom.</p>
+                    </div>
+
+                    <!-- Final Report Card -->
+                    <div class="border-4 border-double border-blue-300 p-6 md:p-8 rounded-xl bg-white shadow-sm relative">
+                        <!-- Decorative element -->
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+
+                        <div class="text-center border-b-2 border-gray-200 pb-4 mb-6">
+                            <h1 class="text-2xl font-bold text-gray-800 uppercase tracking-wider">Hasil Lembar Kerja Siswa</h1>
+                            <p class="text-gray-500 mt-1">Pelajaran 4: Yesus Lahir Bagiku</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nama Siswa</label>
+                                <div class="w-full p-2 border-b-2 border-blue-400 bg-transparent text-xl font-bold text-gray-800" x-text="studentName || '-'"></div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Kelas / No. Absen</label>
+                                <div class="w-full p-2 border-b-2 border-blue-400 bg-transparent text-xl font-bold text-gray-800" x-text="studentClass || '-'"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-8">
+                            <!-- Section 1 Result -->
+                            <section>
+                                <h3 class="font-bold text-blue-700 border-b border-blue-200 pb-1 mb-3">A. Refleksi</h3>
+                                <div class="mb-3">
+                                    <p class="text-sm text-gray-500 font-medium">1. Tujuan Yesus Kristus lahir ke dunia:</p>
+                                    <p class="text-gray-800 bg-gray-50 p-2 rounded italic min-h-[2.5rem]" x-text="answers.tujuan_lahir || '- Belum diisi -'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 font-medium">2. Tanggapan atas kasih Allah:</p>
+                                    <p class="text-gray-800 bg-gray-50 p-2 rounded italic min-h-[2.5rem]" x-text="answers.tanggapan_kasih || '- Belum diisi -'"></p>
+                                </div>
+                            </section>
+
+                            <!-- Section 2 Result (Poem) -->
+                            <section>
+                                <h3 class="font-bold text-blue-700 border-b border-blue-200 pb-1 mb-3">B. Mari Berkarya (Puisi)</h3>
+                                <div class="bg-green-50 p-4 rounded-lg border border-green-200 text-center">
+                                    <h4 class="font-bold text-gray-700 mb-2">Yesus Kristus Juruselamatku</h4>
+                                    <p class="text-gray-800 whitespace-pre-line font-serif" x-text="answers.puisi || '- Belum ada puisi yang ditulis -'"></p>
+                                </div>
+                            </section>
+
+                            <!-- Section 3 Result (Multiple Choice) -->
+                            <section>
+                                <h3 class="font-bold text-blue-700 border-b border-blue-200 pb-1 mb-3">C. Penilaian Pilihan Ganda</h3>
+                                <div class="grid grid-cols-5 gap-2 text-center">
+                                    <div class="bg-gray-100 p-2 rounded border border-gray-200">
+                                        <span class="block text-xs text-gray-500 mb-1">No. 1</span>
+                                        <span class="font-bold text-lg text-blue-600" x-text="answers.pg1 || '-'"></span>
+                                    </div>
+                                    <div class="bg-gray-100 p-2 rounded border border-gray-200">
+                                        <span class="block text-xs text-gray-500 mb-1">No. 2</span>
+                                        <span class="font-bold text-lg text-blue-600" x-text="answers.pg2 || '-'"></span>
+                                    </div>
+                                    <div class="bg-gray-100 p-2 rounded border border-gray-200">
+                                        <span class="block text-xs text-gray-500 mb-1">No. 3</span>
+                                        <span class="font-bold text-lg text-blue-600" x-text="answers.pg3 || '-'"></span>
+                                    </div>
+                                    <div class="bg-gray-100 p-2 rounded border border-gray-200">
+                                        <span class="block text-xs text-gray-500 mb-1">No. 4</span>
+                                        <span class="font-bold text-lg text-blue-600" x-text="answers.pg4 || '-'"></span>
+                                    </div>
+                                    <div class="bg-gray-100 p-2 rounded border border-gray-200">
+                                        <span class="block text-xs text-gray-500 mb-1">No. 5</span>
+                                        <span class="font-bold text-lg text-blue-600" x-text="answers.pg5 || '-'"></span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 4 Result (Essay) -->
+                            <section>
+                                <h3 class="font-bold text-blue-700 border-b border-blue-200 pb-1 mb-3">D. Penilaian Uraian</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">1. Cara memantapkan keyakinan iman:</p>
+                                        <p class="text-gray-800 bg-gray-50 p-2 rounded italic min-h-[2.5rem]" x-text="answers.uraian1 || '- Belum diisi -'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">2. Cara mengembangkan hidup memelihara keselamatan:</p>
+                                        <p class="text-gray-800 bg-gray-50 p-2 rounded italic min-h-[2.5rem]" x-text="answers.uraian2 || '- Belum diisi -'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 font-medium">3. Tindakan agar tidak jatuh dalam dosa:</p>
+                                        <p class="text-gray-800 bg-gray-50 p-2 rounded italic min-h-[2.5rem]" x-text="answers.uraian3 || '- Belum diisi -'"></p>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <div class="mt-8 text-center text-xs text-gray-400 border-t pt-4">
+                                Dikerjakan secara digital pada <span x-text="new Date().toLocaleDateString('id-ID')"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="bg-gray-50 px-6 py-4 md:px-10 flex justify-between items-center border-t border-gray-200 no-print">
+                <button 
+                    @click="prevStep" 
+                    x-show="currentStep > 0"
+                    class="px-5 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Kembali
+                </button>
+                <div x-show="currentStep === 0" class="w-1"></div> <!-- Spacer if no prev button -->
+
+                <button 
+                    @click="nextStep" 
+                    x-show="currentStep < totalSteps - 1"
+                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center ml-auto">
+                    Selanjutnya
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+
+                <button 
+                    @click="printResult" 
+                    x-show="currentStep === totalSteps - 1"
+                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center ml-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Screenshot / Cetak Hasil
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('quizApp', () => ({
+                currentStep: 0,
+                totalSteps: 6, // Refleksi, Puisi, PG1, PG2, Uraian, Hasil
+                studentName: '',
+                studentClass: '',
+                answers: {
+                    tujuan_lahir: '',
+                    tanggapan_kasih: '',
+                    puisi: '',
+                    pg1: '',
+                    pg2: '',
+                    pg3: '',
+                    pg4: '',
+                    pg5: '',
+                    uraian1: '',
+                    uraian2: '',
+                    uraian3: ''
+                },
+                nextStep() {
+                    // Validasi Identitas di langkah pertama (Step 0)
+                    if (this.currentStep === 0 && (!this.studentName.trim() || !this.studentClass.trim())) {
+                        alert("Halo! Mohon isi Nama Lengkap dan Kelas/No. Absen kamu terlebih dahulu sebelum melanjutkan belajar ya.");
+                        return;
+                    }
+                    
+                    if (this.currentStep < this.totalSteps - 1) {
+                        this.currentStep++;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                },
+                prevStep() {
+                    if (this.currentStep > 0) {
+                        this.currentStep--;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                },
+                printResult() {
+                    // Use browser print dialog, users can choose "Save to PDF" or just use native screenshot tools
+                    window.print();
+                }
+            }))
+        })
+    </script>
+</body>
+</html>
